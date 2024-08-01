@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Search } from 'lucide-react';
 
 const fetchCryptos = async () => {
@@ -12,6 +11,7 @@ const fetchCryptos = async () => {
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [terminalText, setTerminalText] = useState('');
   const { data: cryptos, isLoading, isError } = useQuery({
     queryKey: ['cryptos'],
     queryFn: fetchCryptos,
@@ -22,48 +22,64 @@ const Index = () => {
     crypto.symbol.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (isLoading) return <div className="text-center mt-8">Loading...</div>;
-  if (isError) return <div className="text-center mt-8">Error fetching data</div>;
+  useEffect(() => {
+    const text = "Initializing Crypto Tracker...";
+    let i = 0;
+    const typingEffect = setInterval(() => {
+      if (i < text.length) {
+        setTerminalText(prev => prev + text.charAt(i));
+        i++;
+      } else {
+        clearInterval(typingEffect);
+      }
+    }, 50);
+
+    return () => clearInterval(typingEffect);
+  }, []);
+
+  if (isLoading) return <div className="text-center mt-8 terminal-glow">Loading...</div>;
+  if (isError) return <div className="text-center mt-8 terminal-glow text-destructive">Error: Unable to fetch crypto data</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Crypto Tracker</h1>
+    <div className="container mx-auto px-4 py-8 bg-background text-foreground">
+      <h1 className="text-3xl font-bold mb-6 terminal-glow">CryptoHack Terminal</h1>
+      <div className="mb-4 font-mono">{terminalText}</div>
       <div className="relative mb-4">
         <Input
           type="text"
           placeholder="Search cryptocurrencies..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
+          className="pl-10 terminal-input"
         />
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Rank</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Symbol</TableHead>
-            <TableHead>Price (USD)</TableHead>
-            <TableHead>Market Cap (USD)</TableHead>
-            <TableHead>24h Change</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
+      <table className="terminal-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Symbol</th>
+            <th>Price (USD)</th>
+            <th>Market Cap (USD)</th>
+            <th>24h Change</th>
+          </tr>
+        </thead>
+        <tbody>
           {filteredCryptos?.map((crypto) => (
-            <TableRow key={crypto.id}>
-              <TableCell>{crypto.rank}</TableCell>
-              <TableCell>{crypto.name}</TableCell>
-              <TableCell>{crypto.symbol}</TableCell>
-              <TableCell>${parseFloat(crypto.priceUsd).toFixed(2)}</TableCell>
-              <TableCell>${parseFloat(crypto.marketCapUsd).toLocaleString()}</TableCell>
-              <TableCell className={parseFloat(crypto.changePercent24Hr) >= 0 ? 'text-green-600' : 'text-red-600'}>
+            <tr key={crypto.id}>
+              <td>{crypto.rank}</td>
+              <td>{crypto.name}</td>
+              <td>{crypto.symbol}</td>
+              <td>${parseFloat(crypto.priceUsd).toFixed(2)}</td>
+              <td>${parseFloat(crypto.marketCapUsd).toLocaleString()}</td>
+              <td className={parseFloat(crypto.changePercent24Hr) >= 0 ? 'text-primary' : 'text-destructive'}>
                 {parseFloat(crypto.changePercent24Hr).toFixed(2)}%
-              </TableCell>
-            </TableRow>
+              </td>
+            </tr>
           ))}
-        </TableBody>
-      </Table>
+        </tbody>
+      </table>
     </div>
   );
 };
