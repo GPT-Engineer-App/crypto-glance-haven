@@ -42,7 +42,6 @@ const Index = () => {
 
   return (
     <div className="bg-background text-foreground">
-      <h1 className="text-3xl font-bold mb-6 terminal-glow">Crypto Tracker</h1>
       <div className="mb-4 font-mono">{terminalText}</div>
       <div className="relative mb-4">
         <Input
