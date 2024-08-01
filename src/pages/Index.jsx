@@ -27,7 +27,7 @@ const Index = () => {
     let i = 0;
     const typingEffect = setInterval(() => {
       if (i < text.length) {
-        setTerminalText(prev => prev + text.charAt(i));
+        setTerminalText(text.slice(0, i + 1));
         i++;
       } else {
         clearInterval(typingEffect);
