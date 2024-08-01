@@ -41,8 +41,8 @@ const Index = () => {
   if (isError) return <div className="text-center mt-8 terminal-glow text-destructive">Error: Unable to fetch crypto data</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-background text-foreground">
-      <h1 className="text-3xl font-bold mb-6 terminal-glow">CryptoHack Terminal</h1>
+    <div className="bg-background text-foreground">
+      <h1 className="text-3xl font-bold mb-6 terminal-glow">Crypto Tracker</h1>
       <div className="mb-4 font-mono">{terminalText}</div>
       <div className="relative mb-4">
         <Input
