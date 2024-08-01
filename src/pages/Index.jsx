@@ -84,6 +84,7 @@ const Index = () => {
             <th>Price (USD)</th>
             <th>Market Cap (USD)</th>
             <th>24h Change</th>
+            <th>Favorite</th>
           </tr>
         </thead>
         <tbody>
@@ -91,26 +92,26 @@ const Index = () => {
             <tr key={crypto.id}>
               <td>{crypto.rank}</td>
               <td>
-                <div className="flex items-center">
-                  <Link to={`/asset/${crypto.id}`} className="text-primary hover:underline mr-2">
-                    {crypto.name}
-                  </Link>
-                  <button
-                    onClick={() => toggleFavorite(crypto.id)}
-                    className="focus:outline-none"
-                  >
-                    <Star
-                      size={16}
-                      className={favorites.includes(crypto.id) ? "fill-yellow-500 text-yellow-500" : "text-gray-400"}
-                    />
-                  </button>
-                </div>
+                <Link to={`/asset/${crypto.id}`} className="text-primary hover:underline">
+                  {crypto.name}
+                </Link>
               </td>
               <td>{crypto.symbol}</td>
               <td>${parseFloat(crypto.priceUsd).toFixed(2)}</td>
               <td>${parseFloat(crypto.marketCapUsd).toLocaleString()}</td>
               <td className={parseFloat(crypto.changePercent24Hr) >= 0 ? 'text-primary' : 'text-destructive'}>
                 {parseFloat(crypto.changePercent24Hr).toFixed(2)}%
+              </td>
+              <td>
+                <button
+                  onClick={() => toggleFavorite(crypto.id)}
+                  className="focus:outline-none"
+                >
+                  <Star
+                    size={16}
+                    className={favorites.includes(crypto.id) ? "fill-yellow-500 text-yellow-500" : "text-gray-400"}
+                  />
+                </button>
               </td>
             </tr>
           ))}
