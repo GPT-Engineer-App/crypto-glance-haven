@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from "sonner";
 
 const fetchCryptos = async () => {
   const response = await axios.get('https://api.coincap.io/v2/assets');
@@ -13,10 +14,30 @@ const fetchCryptos = async () => {
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [terminalText, setTerminalText] = useState('');
+  const [favorites, setFavorites] = useState(() => {
+    const saved = localStorage.getItem('cryptoFavorites');
+    return saved ? JSON.parse(saved) : [];
+  });
   const { data: cryptos, isLoading, isError } = useQuery({
     queryKey: ['cryptos'],
     queryFn: fetchCryptos,
   });
+
+  useEffect(() => {
+    localStorage.setItem('cryptoFavorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  const toggleFavorite = (cryptoId) => {
+    setFavorites(prevFavorites => {
+      if (prevFavorites.includes(cryptoId)) {
+        toast.success("Removed from favorites");
+        return prevFavorites.filter(id => id !== cryptoId);
+      } else {
+        toast.success("Added to favorites");
+        return [...prevFavorites, cryptoId];
+      }
+    });
+  };
 
   const filteredCryptos = cryptos?.filter(crypto =>
     crypto.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,9 +91,20 @@ const Index = () => {
             <tr key={crypto.id}>
               <td>{crypto.rank}</td>
               <td>
-                <Link to={`/asset/${crypto.id}`} className="text-primary hover:underline">
-                  {crypto.name}
-                </Link>
+                <div className="flex items-center">
+                  <Link to={`/asset/${crypto.id}`} className="text-primary hover:underline mr-2">
+                    {crypto.name}
+                  </Link>
+                  <button
+                    onClick={() => toggleFavorite(crypto.id)}
+                    className="focus:outline-none"
+                  >
+                    <Star
+                      size={16}
+                      className={favorites.includes(crypto.id) ? "fill-yellow-500 text-yellow-500" : "text-gray-400"}
+                    />
+                  </button>
+                </div>
               </td>
               <td>{crypto.symbol}</td>
               <td>${parseFloat(crypto.priceUsd).toFixed(2)}</td>

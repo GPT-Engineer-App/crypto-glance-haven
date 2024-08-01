@@ -3,6 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format } from 'date-fns';
+import { useState, useEffect } from 'react';
+import { Star } from 'lucide-react';
+import { toast } from "sonner";
 
 const fetchAssetDetails = async (id) => {
   const [assetResponse, historyResponse] = await Promise.all([
@@ -17,10 +20,31 @@ const fetchAssetDetails = async (id) => {
 
 const AssetDetails = () => {
   const { id } = useParams();
+  const [isFavorite, setIsFavorite] = useState(false);
   const { data, isLoading, isError } = useQuery({
     queryKey: ['assetDetails', id],
     queryFn: () => fetchAssetDetails(id),
   });
+
+  useEffect(() => {
+    const favorites = JSON.parse(localStorage.getItem('cryptoFavorites') || '[]');
+    setIsFavorite(favorites.includes(id));
+  }, [id]);
+
+  const toggleFavorite = () => {
+    const favorites = JSON.parse(localStorage.getItem('cryptoFavorites') || '[]');
+    if (isFavorite) {
+      const updatedFavorites = favorites.filter(favId => favId !== id);
+      localStorage.setItem('cryptoFavorites', JSON.stringify(updatedFavorites));
+      setIsFavorite(false);
+      toast.success("Removed from favorites");
+    } else {
+      favorites.push(id);
+      localStorage.setItem('cryptoFavorites', JSON.stringify(favorites));
+      setIsFavorite(true);
+      toast.success("Added to favorites");
+    }
+  };
 
   if (isLoading) return <div className="text-center mt-8 terminal-glow">Loading asset details...</div>;
   if (isError) return <div className="text-center mt-8 terminal-glow text-destructive">Error: Unable to fetch asset details</div>;
@@ -34,7 +58,18 @@ const AssetDetails = () => {
 
   return (
     <div className="bg-background text-foreground p-4">
-      <h1 className="text-2xl font-bold mb-4 terminal-glow">{asset.name} ({asset.symbol})</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold terminal-glow">{asset.name} ({asset.symbol})</h1>
+        <button
+          onClick={toggleFavorite}
+          className="focus:outline-none"
+        >
+          <Star
+            size={24}
+            className={isFavorite ? "fill-yellow-500 text-yellow-500" : "text-gray-400"}
+          />
+        </button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <div>
           <p><strong>Rank:</strong> {asset.rank}</p>
