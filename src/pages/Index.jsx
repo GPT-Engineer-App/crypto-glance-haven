@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const fetchCryptos = async () => {
   const response = await axios.get('https://api.coincap.io/v2/assets');
@@ -68,7 +69,11 @@ const Index = () => {
           {filteredCryptos?.map((crypto) => (
             <tr key={crypto.id}>
               <td>{crypto.rank}</td>
-              <td>{crypto.name}</td>
+              <td>
+                <Link to={`/asset/${crypto.id}`} className="text-primary hover:underline">
+                  {crypto.name}
+                </Link>
+              </td>
               <td>{crypto.symbol}</td>
               <td>${parseFloat(crypto.priceUsd).toFixed(2)}</td>
               <td>${parseFloat(crypto.marketCapUsd).toLocaleString()}</td>
