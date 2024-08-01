@@ -19,10 +19,12 @@ export const navItems = [
     icon: <Star className="h-4 w-4" />,
     page: <Favorites />,
   },
+];
+
+export const routes = [
+  ...navItems,
   {
-    title: "Asset Details",
     to: "/asset/:id",
     page: <AssetDetails />,
-    hidden: true,
   },
 ];
