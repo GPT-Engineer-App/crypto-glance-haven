@@ -28,6 +28,14 @@ const fromSupabase = async (query) => {
 | created_at | timestamptz | string | true     |
 | date       | date        | string | true     |
 
+### items
+
+| name       | type        | format | required |
+|------------|-------------|--------|----------|
+| id         | int8        | number | true     |
+| name       | text        | string | true     |
+| created_at | timestamptz | string | true     |
+
 */
 
 // Hooks for event table
@@ -68,6 +76,42 @@ export const useDeleteEvent = () => {
         mutationFn: (id) => fromSupabase(supabase.from('event').delete().eq('id', id)),
         onSuccess: () => {
             queryClient.invalidateQueries('events');
+        },
+    });
+};
+
+// Hooks for items table
+export const useItems = () => useQuery({
+    queryKey: ['items'],
+    queryFn: () => fromSupabase(supabase.from('items').select('*')),
+});
+
+export const useAddItem = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newItem) => fromSupabase(supabase.from('items').insert([newItem])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('items');
+        },
+    });
+};
+
+export const useUpdateItem = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, ...updateData }) => fromSupabase(supabase.from('items').update(updateData).eq('id', id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('items');
+        },
+    });
+};
+
+export const useDeleteItem = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id) => fromSupabase(supabase.from('items').delete().eq('id', id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('items');
         },
     });
 };
