@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Search, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from "sonner";
-import FuturisticConfetti from '@/components/FuturisticConfetti';
 
 const fetchCryptos = async () => {
   const response = await axios.get('https://api.coincap.io/v2/assets');
@@ -19,7 +18,6 @@ const Index = () => {
     const saved = localStorage.getItem('cryptoFavorites');
     return saved ? JSON.parse(saved) : [];
   });
-  const [showConfetti, setShowConfetti] = useState(false);
   const { data: cryptos, isLoading, isError } = useQuery({
     queryKey: ['cryptos'],
     queryFn: fetchCryptos,
@@ -35,7 +33,6 @@ const Index = () => {
         toast.success("Removed from favorites");
         return prevFavorites.filter(id => id !== cryptoId);
       } else {
-        setShowConfetti(true);
         toast.success("Added to favorites");
         return [...prevFavorites, cryptoId];
       }
@@ -67,7 +64,6 @@ const Index = () => {
 
   return (
     <div className="bg-background text-foreground">
-      <FuturisticConfetti trigger={showConfetti} />
       <div className="mb-4 font-mono">{terminalText}</div>
       <div className="relative mb-4">
         <Input

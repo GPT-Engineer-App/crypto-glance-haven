@@ -6,7 +6,6 @@ import { format } from 'date-fns';
 import { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
 import { toast } from "sonner";
-import FuturisticConfetti from '@/components/FuturisticConfetti';
 
 const fetchAssetDetails = async (id) => {
   const [assetResponse, historyResponse] = await Promise.all([
@@ -22,7 +21,6 @@ const fetchAssetDetails = async (id) => {
 const AssetDetails = () => {
   const { id } = useParams();
   const [isFavorite, setIsFavorite] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
   const { data, isLoading, isError } = useQuery({
     queryKey: ['assetDetails', id],
     queryFn: () => fetchAssetDetails(id),
@@ -44,7 +42,6 @@ const AssetDetails = () => {
       favorites.push(id);
       localStorage.setItem('cryptoFavorites', JSON.stringify(favorites));
       setIsFavorite(true);
-      setShowConfetti(true);
       toast.success("Added to favorites");
     }
   };
@@ -61,7 +58,6 @@ const AssetDetails = () => {
 
   return (
     <div className="bg-background text-foreground p-4">
-      <FuturisticConfetti trigger={showConfetti} />
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold terminal-glow">{asset.name} ({asset.symbol})</h1>
         <button
